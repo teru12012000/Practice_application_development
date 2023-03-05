@@ -38,3 +38,38 @@ post_router.get("/public",(req:Request,res:Response)=>{
     }
   })
 })
+
+
+post_router.post("/privatepost",(req:Request,res:Response)=>{
+  const email:string=req.body;
+  const name:string=req.body.name;
+  const birth:string=req.body.birth;
+  const title:string=req.body.title;
+  const detail:string=req.body.detail;
+
+  pool.query("SELECT s FROM users s WHERE s.email = $1",[email],(err,result)=>{
+    if(err){
+      return res.json({
+        message:"SQLに問題があります",
+      })
+    }else if(!result.rows.length){
+      message:"そのユーザーは存在しません。"
+    }else{
+      const table:string=name+birth;
+      pool.query(`INSERT INTO ${table}(name, title, body) values ($1, $2, $3)`,[name,title,detail],(err,result)=>{
+        if(err){
+          return res.json({
+            message:"SQLに問題があります"
+          })
+        }else{
+          return res.json({
+            message:"OK",
+          })
+        }
+      })
+    }
+  })
+
+  
+
+})
