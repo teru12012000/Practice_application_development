@@ -8,7 +8,7 @@ post_router.post("/publicpost",(req:Request,res:Response)=>{
   pool.query("INSERT INTO public(name, title, detail) values ($1, $2, $3)",[name,title,detail],(error,result)=>{
     if(error){
       return res.json({
-        message:"sql文にエラーがあります",
+        message:"sql文(挿入)にエラーがあります",
       })
     }else{
       return res.json({
