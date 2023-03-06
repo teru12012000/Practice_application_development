@@ -69,7 +69,33 @@ post_router.post("/privatepost",(req:Request,res:Response)=>{
       })
     }
   })
+})
 
-  
-
+post_router.get("/private",(req:Request,res:Response)=>{
+  const email:string=req.body.email;
+  pool.query("SELECT s FROM users s WHERE s.email= $1",[email],(err,result)=>{
+    if(err){
+      return res.json({
+        message:"SQL文(SELECT文)に問題があります",
+      })
+    }else if(!result.rows.length){
+      return res.json({
+        message:"そのユーザは存在していません",
+      })
+    }else{
+      const table:string=result.rows[0].name+result.rows[0].birth;
+      pool.query(`SELECT * FROM ${table}`,(err,result)=>{
+        if(err){
+          return res.json({
+            message:"sql文に問題があります",
+          })
+        }else{
+          return res.json({
+            message:"OK",
+            list:result.rows,
+          })
+        }
+      })
+    }
+  })
 })
