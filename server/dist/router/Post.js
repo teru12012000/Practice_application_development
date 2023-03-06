@@ -9,7 +9,7 @@ exports.post_router.post("/publicpost", (req, res) => {
     db_1.pool.query("INSERT INTO public(name, title, detail) values ($1, $2, $3)", [name, title, detail], (error, result) => {
         if (error) {
             return res.json({
-                message: "sql文にエラーがあります",
+                message: "sql文(挿入)にエラーがあります",
             });
         }
         else {
@@ -37,6 +37,69 @@ exports.post_router.get("/public", (req, res) => {
             return res.json({
                 message: "OK",
                 list: result.rows,
+            });
+        }
+    });
+});
+exports.post_router.post("/privatepost", (req, res) => {
+    const email = req.body;
+    const name = req.body.name;
+    const birth = req.body.birth;
+    const title = req.body.title;
+    const detail = req.body.detail;
+    db_1.pool.query("SELECT s FROM users s WHERE s.email = $1", [email], (err, result) => {
+        if (err) {
+            return res.json({
+                message: "SQLに問題があります",
+            });
+        }
+        else if (!result.rows.length) {
+            message: "そのユーザーは存在しません。";
+        }
+        else {
+            const table = name + birth;
+            db_1.pool.query(`INSERT INTO ${table}(name, title, body) values ($1, $2, $3)`, [name, title, detail], (err, result) => {
+                if (err) {
+                    return res.json({
+                        message: "SQLに問題があります"
+                    });
+                }
+                else {
+                    return res.json({
+                        message: "OK",
+                    });
+                }
+            });
+        }
+    });
+});
+exports.post_router.get("/private", (req, res) => {
+    const email = req.body.email;
+    db_1.pool.query("SELECT s FROM users s WHERE s.email= $1", [email], (err, result) => {
+        if (err) {
+            return res.json({
+                message: "SQL文(SELECT文)に問題があります",
+            });
+        }
+        else if (!result.rows.length) {
+            return res.json({
+                message: "そのユーザは存在していません",
+            });
+        }
+        else {
+            const table = result.rows[0].name + result.rows[0].birth;
+            db_1.pool.query(`SELECT * FROM ${table}`, (err, result) => {
+                if (err) {
+                    return res.json({
+                        message: "sql文に問題があります",
+                    });
+                }
+                else {
+                    return res.json({
+                        message: "OK",
+                        list: result.rows,
+                    });
+                }
             });
         }
     });
