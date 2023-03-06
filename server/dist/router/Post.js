@@ -42,23 +42,27 @@ exports.post_router.get("/public", (req, res) => {
     });
 });
 exports.post_router.post("/privatepost", (req, res) => {
-    const email = req.body;
+    const email = req.body.email;
     const name = req.body.name;
-    const birth = req.body.birth;
     const title = req.body.title;
     const detail = req.body.detail;
-    db_1.pool.query("SELECT s FROM users s WHERE s.email = $1", [email], (err, result) => {
+    db_1.pool.query("SELECT * FROM users  WHERE mail = $1", [email], (err, result) => {
         if (err) {
             return res.json({
                 message: "SQLに問題があります",
             });
         }
         else if (!result.rows.length) {
-            message: "そのユーザーは存在しません。";
+            return res.json({
+                message: "そのユーザーは存在しません。"
+            });
         }
         else {
-            const table = name + birth;
-            db_1.pool.query(`INSERT INTO ${table}(name, title, body) values ($1, $2, $3)`, [name, title, detail], (err, result) => {
+            const dataname = result.rows[0].name;
+            const databirth = result.rows[0].birth;
+            const table = dataname + databirth;
+            console.log(result.rows);
+            db_1.pool.query(`INSERT INTO ${table}(name, title, detail) values ($1, $2, $3)`, [name, title, detail], (err, result) => {
                 if (err) {
                     return res.json({
                         message: "SQLに問題があります"
@@ -75,7 +79,7 @@ exports.post_router.post("/privatepost", (req, res) => {
 });
 exports.post_router.get("/private", (req, res) => {
     const email = req.body.email;
-    db_1.pool.query("SELECT s FROM users s WHERE s.email= $1", [email], (err, result) => {
+    db_1.pool.query("SELECT * FROM users WHERE mail= $1", [email], (err, result) => {
         if (err) {
             return res.json({
                 message: "SQL文(SELECT文)に問題があります",
