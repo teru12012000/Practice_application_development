@@ -93,6 +93,10 @@ post_router.get("/private",(req:Request,res:Response)=>{
           return res.json({
             message:"sql文に問題があります",
           })
+        }else if(!result.rows.length){
+          return res.json({
+            message:"投稿がありません"
+          })
         }else{
           return res.json({
             message:"OK",
