@@ -98,6 +98,11 @@ exports.post_router.get("/private", (req, res) => {
                         message: "sql文に問題があります",
                     });
                 }
+                else if (!result.rows.length) {
+                    return res.json({
+                        message: "投稿がありません"
+                    });
+                }
                 else {
                     return res.json({
                         message: "OK",
