@@ -1,3 +1,4 @@
+import Back from "@/components/Back/Back";
 import Contain from "@/components/contain/Contain";
 import Header from "@/components/Header/Header";
 import { memberlist } from "@/data/postdata";
@@ -58,6 +59,7 @@ const Alluser:NextPage<Props> = ({message,list}) => {
         <link rel="icon" href="/favicon.ico" />
       </Head>
       <Header/>
+      <Back/>
       <Contain>
         <>
           <h1 className='animate__animated animate__backInLeft'>登録しているユーザ</h1>
