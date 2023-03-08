@@ -23,7 +23,11 @@ export default function Home() {
         <div>
           <h1 className='animate__animated animate__backInLeft'>hello</h1>
           {openinglink.map((item:linkdata,index:number)=>(
-            <div key={index} className="animate__animated animate__backInLeft animate__delay-1s">
+            <div 
+              key={index} 
+              className={`animate__animated animate__backInLeft animate__delay-1s`}
+              style={{marginTop:"10px"}}
+            >
               <Link href={item.link} key={index} target={item.target}>
                 <Button variant="contained">
                   {item.title}

@@ -29,12 +29,6 @@ const StyledTableRow = styled(TableRow)(({ theme }) => ({
     border: 0,
   },
 }));
-
-
-
-
-
-//SSR
 export const getServerSideProps:GetServerSideProps<Props>=async()=>{
   const res=await fetch("http://localhost:5050/member/allusers");
   const data=await res.json();
