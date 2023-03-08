@@ -28,8 +28,8 @@ export default function Home() {
               className={`animate__animated animate__backInLeft animate__delay-1s`}
               style={{marginTop:"10px"}}
             >
-              <Link href={item.link} key={index} target={item.target}>
-                <Button variant="contained">
+              <Link href={item.link} key={index} target={item.target} style={{textDecoration:"none"}}>
+                <Button variant="contained" >
                   {item.title}
                 </Button>
               </Link>
