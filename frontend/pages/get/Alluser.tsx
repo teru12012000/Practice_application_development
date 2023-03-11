@@ -1,16 +1,12 @@
 import Back from "@/components/Back/Back";
 import Contain from "@/components/contain/Contain";
 import Header from "@/components/Header/Header";
-import { memberlist } from "@/data/postdata";
-import { Paper, Table, TableBody, TableCell, tableCellClasses, TableContainer, TableHead, TableRow } from "@mui/material";
+import { memberlist, Props } from "@/data/postdata";
+import { Paper, Table, TableBody, TableCell, tableCellClasses, TableContainer, TableHead, TableRow, TextField } from "@mui/material";
 import { styled } from "@mui/material/styles";
 import { NextPage, GetServerSideProps } from "next";
 import Head from "next/head";
-type Props={
-  message:string;
-  list:memberlist[]|undefined;
-}
-
+import { ChangeEvent, useState } from "react";
 const StyledTableCell = styled(TableCell)(({ theme }) => ({
   [`&.${tableCellClasses.head}`]: {
     backgroundColor: theme.palette.common.black,
@@ -44,6 +40,22 @@ export const getServerSideProps:GetServerSideProps<Props>=async()=>{
 
 
 const Alluser:NextPage<Props> = ({message,list}) => {
+  const [messa,setMessa]=useState<string>(message);
+  const [searchlist,setSearchlist]=useState<memberlist[]|undefined>(list);
+  const handleChange=async(e: ChangeEvent<HTMLInputElement | HTMLTextAreaElement>)=>{
+      if(e.currentTarget.value){
+        const res=await fetch(`http://localhost:5050/member/search/${e.currentTarget.value}`);
+      const data=await res.json();
+      if(data.list){
+        setSearchlist(data.list as memberlist[])
+      }else{
+        setSearchlist(undefined);
+        setMessa(data.message);
+      }
+    }else{
+      setSearchlist(list)
+    }
+  }
   return (
     <>
       <Head>
@@ -54,11 +66,20 @@ const Alluser:NextPage<Props> = ({message,list}) => {
       </Head>
       <Header/>
       <Back/>
+      <div style={{textAlign:"center",marginTop:"20px"}}>
+        <TextField 
+          id="outlined-basic" 
+          label="検索したいワードを入力" 
+          variant="outlined" 
+          disabled={list?false:true}
+          onChange={(e)=>handleChange(e)}
+        />
+      </div>
       <Contain>
         <>
           <h1 className='animate__animated animate__backInLeft'>登録しているユーザ</h1>
-          {list?(
-            <TableContainer component={Paper} className="animate__animated animate__backInLeft animate__delay-1s">
+          {searchlist?(
+            <TableContainer component={Paper} className="animate__animated animate__fadeIn">
               <Table area-label="memberlist">
                 <TableHead>
                   <TableRow>
@@ -68,7 +89,7 @@ const Alluser:NextPage<Props> = ({message,list}) => {
                   </TableRow>
                 </TableHead>
                 <TableBody>
-                  {list?.map((item:memberlist,index:number)=>(
+                  {searchlist?.map((item:memberlist,index:number)=>(
                     <StyledTableRow key={index}>
                       <StyledTableCell align="center">{item.name}</StyledTableCell>
                       <StyledTableCell align="center">{item.mail}</StyledTableCell>
@@ -79,7 +100,7 @@ const Alluser:NextPage<Props> = ({message,list}) => {
               </Table>
             </TableContainer>
           ):(
-            <p className="animate__animated animate__backInLeft animate__delay-1s">{message}</p>
+            <p className="animate__animated animate__fadeIn">{messa}</p>
           )}
         </>
       </Contain>

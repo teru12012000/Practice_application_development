@@ -1,13 +1,15 @@
 import Back from "@/components/Back/Back";
 import Contain from "@/components/contain/Contain";
 import Header from "@/components/Header/Header";
-import { postmenu } from "@/data/postdata";
+import { postmenu, Props2 } from "@/data/postdata";
 import { Button, TextField } from "@mui/material";
 import { NextPage } from "next";
 import Head from "next/head";
+import { useRouter } from "next/router";
 import { ChangeEvent, Dispatch, SetStateAction, useState } from "react";
 
 const Addmember:NextPage = () => {
+  const router=useRouter();
   const [name,setName]=useState<string>("");
   const [mail,setMail]=useState<string>("");
   const [birth,setBirth]=useState<string>("");
@@ -32,8 +34,28 @@ const Addmember:NextPage = () => {
     setInfo(e.currentTarget.value);
   }
 
-  const handleClick=()=>{
-
+  const handleClick=async()=>{
+    const res=await fetch("http://localhost:5050/member/add",{
+      method:"POST",
+      headers:{
+        'Content-Type':'application/json'
+      },
+      body:JSON.stringify({
+        "name":name,
+        "mail":mail,
+        "birth":birth,
+      })
+    });
+    
+    const data:Props2=await res.json() as Props2;
+    if(data.message==="OK"){
+      setName("");
+      setMail("");
+      setBirth("");
+      router.push("/Success/Success")
+    }else{
+      alert(`エラーメッセージ：${data.message}`);
+    }
   }
   return (
     <>
@@ -50,10 +72,10 @@ const Addmember:NextPage = () => {
           <h1 className='animate__animated animate__backInLeft'>メンバー追加</h1>
           <div className="animate__animated animate__fadeIn">
             {postlist.map((item:postmenu,index:number)=>(
-               <div
+              <div
                 key={index}
                 style={{marginTop:"10px"}}
-               >
+              >
                 <TextField 
                   id="outlined-basic" 
                   label={item.title} 
@@ -61,7 +83,7 @@ const Addmember:NextPage = () => {
                   onChange={(e)=>handleChange(e,item.setInfo,item.title)}
                 />
                 <p style={{textAlign:"start",color:"gray"}}>ex：{item.example}</p>
-               </div>
+              </div>
             ))}
             <div style={{marginTop:"10px"}}>
               <Button 
