@@ -10,8 +10,8 @@ export const openinglink:linkdata[]=[
     title:"すべてのユーザ閲覧",
     target:"",
   },{
-    link:"/post/Addmember",
-    title:"ユーザ登録",
+    link:"/change/ChangeHome",
+    title:"ユーザー編集",
     target:"",
   }
 ];
@@ -27,6 +27,10 @@ export const successlink:linkdata[]=[
   },{
     link:"/post/Addmember",
     title:"続けてユーザ登録",
+    target:"",
+  },{
+    link:"/change/ChangeHome",
+    title:"編集ページへ",
     target:"",
   }
 ] 

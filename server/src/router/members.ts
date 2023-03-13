@@ -4,6 +4,7 @@ import { Result, validationResult } from "express-validator/src/validation-resul
 import { pool } from "../db/db";
 
 export const router=Router();
+//search
 router.get("/search/:word",(req:Request,res:Response)=>{
   const {word}=req.params;
   pool.query("SELECT * FROM users WHERE name LIKE $1 OR mail LIKE $1 OR birth LIKE $1",[`%${word}%`],(err,result)=>{
@@ -24,6 +25,7 @@ router.get("/search/:word",(req:Request,res:Response)=>{
     }
   })
 })
+//alluser
 router.get("/allusers",(req:Request,res:Response)=>{
   pool.query("SELECT * FROM users ORDER BY id ASC;",(error,reslt)=>{
     if(error){
@@ -45,7 +47,7 @@ router.get("/allusers",(req:Request,res:Response)=>{
     }
   })
 });
-
+//post user
 router.post("/add",
   body("name").notEmpty(),
   body("mail").isEmail(),
@@ -96,7 +98,7 @@ router.post("/add",
     })
   })
 });
-
+// change information
 router.put("/changeinfo/:id",
 body("name").notEmpty(),
 body("mail").isEmail(),
@@ -136,4 +138,22 @@ body("birth").isLength({min:8,max:8}),
   })
 });
 
-
+router.get("/:id",(req:Request,res:Response)=>{
+  const {id}=req.params;
+  pool.query("SELECT * FROM users WHERE id=$1",[id],(err,result)=>{
+    if(err){
+      return res.json({
+        message:"sqlにエラーがあります",
+      })
+    }else if(!result.rows.length){
+      return res.json({
+        message:"そのユーザは存在しない"
+      })      
+    }else{
+      return res.json({
+        message:"OK",
+        list:result.rows[0],
+      })
+    }
+  })
+})

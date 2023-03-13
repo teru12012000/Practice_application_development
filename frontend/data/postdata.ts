@@ -10,7 +10,8 @@ export type memberlist={
 export type postmenu={
   title:string;
   example:string;
-  setInfo:Dispatch<SetStateAction<string>>;
+  info:string|undefined;
+  setInfo:Dispatch<SetStateAction<string|undefined>>;
 }
 
 export type Props={
@@ -19,5 +20,9 @@ export type Props={
 }
 export type Props2={
   message:string
+}
+export type Props3={
+  message:string;
+  list:memberlist|undefined;
 }
 

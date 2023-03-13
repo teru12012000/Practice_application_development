@@ -2,18 +2,40 @@ import Back from "@/components/Back/Back";
 import Contain from "@/components/contain/Contain";
 import Header from "@/components/Header/Header";
 import InputForm from "@/components/InputForm/InputForm";
-import { postmenu, Props2 } from "@/data/postdata";
-import { Button, TextField } from "@mui/material";
-import { NextPage } from "next";
+import { memberlist, postmenu, Props, Props2, Props3 } from "@/data/postdata";
+import { GetStaticPaths, GetStaticProps, NextPage } from "next";
+import { Params } from "next/dist/shared/lib/router/utils/route-matcher";
 import Head from "next/head";
 import { useRouter } from "next/router";
 import { useState } from "react";
 
-const Addmember:NextPage = () => {
-  const router=useRouter();
-  const [name,setName]=useState<string|undefined>("");
-  const [mail,setMail]=useState<string|undefined>("");
-  const [birth,setBirth]=useState<string|undefined>("");
+export const getStaticPaths:GetStaticPaths<Params>=async()=>{
+  const res=await fetch("http://localhost:5050/member/allusers");
+  const resdata=await res.json();
+  const paths=resdata.list?.map((item:memberlist)=>(`/change/${item.id}`));
+  return {
+    paths:paths ?? [],
+    fallback:false,
+  }
+}
+
+export const getStaticProps:GetStaticProps<Props3,Params>=async(context)=>{
+  const id=context.params?.id;
+  const res=await fetch(`http://localhost:5050/member/${id}`);
+  const resdata:Props3=await res.json() as Props3;
+  return {
+    props:{
+      message:resdata.message,
+      list:resdata.list,
+    }
+  }
+}
+
+const Change:NextPage<Props3> = ({message,list})=> {
+  const router=useRouter(); 
+  const [name,setName]=useState<string|undefined>(list?.name);
+  const [mail,setMail]=useState<string|undefined>(list?.mail);
+  const [birth,setBirth]=useState<string|undefined>(list?.birth);
   const [canpush,setCanpush]=useState<boolean>(true);
   const postlist:postmenu[]=[
     {
@@ -34,8 +56,8 @@ const Addmember:NextPage = () => {
     }
   ];
   const handleClick=async()=>{
-    const res=await fetch("http://localhost:5050/member/add",{
-      method:"POST",
+    const res=await fetch(`http://localhost:5050/member//changeinfo/${list?.id}`,{
+      method:"PUT",
       headers:{
         'Content-Type':'application/json'
       },
@@ -47,11 +69,12 @@ const Addmember:NextPage = () => {
     });
     
     const data:Props2=await res.json() as Props2;
-    if(data.message==="OK"){
+    if(data.message==="ユーザーを正常に更新しました。"){
       setName("");
       setMail("");
       setBirth("");
-      router.push("/Success/Success")
+      alert("ユーザーを正常に更新しました。");
+      router.push("/change/ChangeHome");
     }else{
       alert(`エラーメッセージ：${data.message}`);
     }
@@ -59,7 +82,7 @@ const Addmember:NextPage = () => {
   return (
     <>
       <Head>
-        <title>ユーザー登録</title>
+        <title>ユーザー編集</title>
         <meta name="description" content="ユーザーを登録するところです" />
         <meta name="viewport" content="width=device-width, initial-scale=1" />
         <link rel="icon" href="/favicon.ico" />
@@ -68,17 +91,17 @@ const Addmember:NextPage = () => {
       <Back/>
       <Contain>
         <div>
-          <h1 className='animate__animated animate__backInLeft'>メンバー追加</h1>
+          <h1 className='animate__animated animate__backInLeft'>ユーザーの編集</h1>
           <InputForm
             list={postlist}
-            btn="追加"
+            btn="編集"
             func={handleClick}
           />
         </div>
       </Contain>
     
     </>
-  );
+  )
 }
 
-export default Addmember;
+export default Change;

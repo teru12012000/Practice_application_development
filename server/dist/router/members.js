@@ -6,6 +6,7 @@ const validation_chain_builders_1 = require("express-validator/src/middlewares/v
 const validation_result_1 = require("express-validator/src/validation-result");
 const db_1 = require("../db/db");
 exports.router = (0, express_1.Router)();
+//search
 exports.router.get("/search/:word", (req, res) => {
     const { word } = req.params;
     db_1.pool.query("SELECT * FROM users WHERE name LIKE $1 OR mail LIKE $1 OR birth LIKE $1", [`%${word}%`], (err, result) => {
@@ -28,6 +29,7 @@ exports.router.get("/search/:word", (req, res) => {
         }
     });
 });
+//alluser
 exports.router.get("/allusers", (req, res) => {
     db_1.pool.query("SELECT * FROM users ORDER BY id ASC;", (error, reslt) => {
         if (error) {
@@ -50,6 +52,7 @@ exports.router.get("/allusers", (req, res) => {
         }
     });
 });
+//post user
 exports.router.post("/add", (0, validation_chain_builders_1.body)("name").notEmpty(), (0, validation_chain_builders_1.body)("mail").isEmail(), (0, validation_chain_builders_1.body)("birth").isLength({ min: 8, max: 8 }), (req, res) => {
     const name = req.body.name;
     const mail = req.body.mail;
@@ -99,6 +102,7 @@ exports.router.post("/add", (0, validation_chain_builders_1.body)("name").notEmp
         });
     });
 });
+// change information
 exports.router.put("/changeinfo/:id", (0, validation_chain_builders_1.body)("name").notEmpty(), (0, validation_chain_builders_1.body)("mail").isEmail(), (0, validation_chain_builders_1.body)("birth").isLength({ min: 8, max: 8 }), (req, res) => {
     const numid = parseInt(req.params.id, 10);
     console.log(numid);
@@ -131,6 +135,27 @@ exports.router.put("/changeinfo/:id", (0, validation_chain_builders_1.body)("nam
         else {
             res.json({
                 message: "ユーザーを正常に更新しました。"
+            });
+        }
+    });
+});
+exports.router.get("/:id", (req, res) => {
+    const { id } = req.params;
+    db_1.pool.query("SELECT * FROM users WHERE id=$1", [id], (err, result) => {
+        if (err) {
+            return res.json({
+                message: "sqlにエラーがあります",
+            });
+        }
+        else if (!result.rows.length) {
+            return res.json({
+                message: "そのユーザは存在しない"
+            });
+        }
+        else {
+            return res.json({
+                message: "OK",
+                list: result.rows[0],
             });
         }
     });

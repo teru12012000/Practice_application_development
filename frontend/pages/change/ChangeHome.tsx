@@ -1,14 +1,11 @@
-import Back from "@/components/Back/Back";
-import Contain from "@/components/contain/Contain";
 import Header from "@/components/Header/Header";
 import MemberList from "@/components/memberlist/MemberList";
 import { memberlist, Props } from "@/data/postdata";
-
-
-import { NextPage, GetServerSideProps } from "next";
+import { Button } from "@mui/material";
+import { GetServerSideProps, NextPage } from "next";
 import Head from "next/head";
-import { ChangeEvent, useState } from "react";
-
+import Link from "next/link";
+import { useState } from "react";
 export const getServerSideProps:GetServerSideProps<Props>=async()=>{
   const res=await fetch("http://localhost:5050/member/allusers");
   const data=await res.json();
@@ -19,19 +16,14 @@ export const getServerSideProps:GetServerSideProps<Props>=async()=>{
     }
   } 
 } 
-
-
-
-
-const Alluser:NextPage<Props> = ({message,list}) => {
+const ChangeHome:NextPage<Props> = ({message,list})=> {
   const [messa,setMessa]=useState<string>(message);
   const [searchlist,setSearchlist]=useState<memberlist[]|undefined>(list);
-  
   return (
     <>
       <Head>
-        <title>すべてのユーザー</title>
-        <meta name="description" content="登録したユーザーについてです。" />
+        <title>編集</title>
+        <meta name="description" content="ユーザー編集について" />
         <meta name="viewport" content="width=device-width, initial-scale=1" />
         <link rel="icon" href="/favicon.ico" />
       </Head>
@@ -41,10 +33,17 @@ const Alluser:NextPage<Props> = ({message,list}) => {
         searchlist={searchlist}
         setMessa={setMessa}
         setSearchlist={setSearchlist}
-        change={false}
+        change={true}
       />
+      <div style={{textAlign:"center"}}>
+        <Link href="/post/Addmember">
+          <Button variant="contained">
+            ユーザー追加
+          </Button>
+        </Link>
+      </div>
     </>
   );
 }
 
-export default Alluser;
+export default ChangeHome;
