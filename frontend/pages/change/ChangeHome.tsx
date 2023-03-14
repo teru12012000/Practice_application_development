@@ -5,6 +5,7 @@ import { Button } from "@mui/material";
 import { GetServerSideProps, NextPage } from "next";
 import Head from "next/head";
 import Link from "next/link";
+import { useRouter } from "next/router";
 import { useState } from "react";
 export const getServerSideProps:GetServerSideProps<Props>=async()=>{
   const res=await fetch("http://localhost:5050/member/allusers");
@@ -19,6 +20,7 @@ export const getServerSideProps:GetServerSideProps<Props>=async()=>{
 const ChangeHome:NextPage<Props> = ({message,list})=> {
   const [messa,setMessa]=useState<string>(message);
   const [searchlist,setSearchlist]=useState<memberlist[]|undefined>(list);
+  const router=useRouter();
   return (
     <>
       <Head>
@@ -34,6 +36,7 @@ const ChangeHome:NextPage<Props> = ({message,list})=> {
         setMessa={setMessa}
         setSearchlist={setSearchlist}
         change={true}
+        router={router}
       />
       <div style={{textAlign:"center"}}>
         <Link href="/post/Addmember">

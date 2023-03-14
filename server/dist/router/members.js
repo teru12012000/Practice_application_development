@@ -160,3 +160,32 @@ exports.router.get("/:id", (req, res) => {
         }
     });
 });
+exports.router.delete("/deletemember/:id", (req, res) => {
+    const { id } = req.params;
+    db_1.pool.query("SELECT s FROM users s WHERE s.id=$1", [id], (err, result) => {
+        if (err) {
+            return res.json({
+                message: "SQLのエラーです",
+            });
+        }
+        else if (!result.rows.length) {
+            return res.json({
+                message: "そのユーザーは存在しない",
+            });
+        }
+        else {
+            db_1.pool.query("DELETE FROM users WHERE id=$1", [id], (err, result) => {
+                if (err) {
+                    return res.json({
+                        message: "SQL文(DELETE)のエラーです"
+                    });
+                }
+                else {
+                    return res.json({
+                        message: "ユーザを削除しました"
+                    });
+                }
+            });
+        }
+    });
+});

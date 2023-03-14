@@ -6,6 +6,7 @@ import { memberlist } from "@/data/postdata";
 import { StyledTableCell, StyledTableRow } from "@/styles/TableStyle";
 import memberliststyle from "./memberlist.css";
 import Link from "next/link";
+import { NextRouter } from "next/router";
 
 type Props={
   list:memberlist[]|undefined;
@@ -14,22 +15,36 @@ type Props={
   setMessa:Dispatch<SetStateAction<string>>;
   setSearchlist:Dispatch<SetStateAction<memberlist[]|undefined>>;
   change:boolean;
+  router:NextRouter;
 }
-const MemberList:FC<Props> = ({list,messa,searchlist,setMessa,setSearchlist,change}) => {
+const MemberList:FC<Props> = ({list,messa,searchlist,setMessa,setSearchlist,change,router}) => {
   const handleChange=async(e: ChangeEvent<HTMLInputElement | HTMLTextAreaElement>)=>{
     if(e.currentTarget.value){
       const res=await fetch(`http://localhost:5050/member/search/${e.currentTarget.value}`);
-    const data=await res.json();
-    if(data.list){
-      setSearchlist(data.list as memberlist[])
+      const data=await res.json();
+      if(data.list){
+        setSearchlist(data.list as memberlist[])
+      }else{
+        setSearchlist(undefined);
+        setMessa(data.message);
+      }
     }else{
-      setSearchlist(undefined);
-      setMessa(data.message);
+      setSearchlist(list)
     }
-  }else{
-    setSearchlist(list)
   }
-}
+  const handledeleteclick=async(id:number)=>{
+    const strid=String(id);
+    const res=await fetch(`http://localhost:5050/member/deletemember/${strid}`,{
+      method:"DELETE",
+    });
+    const data=await res.json();
+    if(data.message==="ユーザを削除しました"){
+      alert("ユーザを削除しました");
+      window.location.reload();
+    }else{
+      alert(data.message);
+    }
+  }
   return (
     <>
       <Header/>
@@ -53,7 +68,12 @@ const MemberList:FC<Props> = ({list,messa,searchlist,setMessa,setSearchlist,chan
                   <StyledTableCell align="center">名前</StyledTableCell>
                   <StyledTableCell align="center">メール</StyledTableCell>
                   <StyledTableCell align="center">誕生日(yyyymmdd)</StyledTableCell>
-                  {change?(<StyledTableCell align="center">編集</StyledTableCell>):null}
+                  {change?(
+                    <>
+                      <StyledTableCell align="center">編集</StyledTableCell>
+                      <StyledTableCell align="center">削除</StyledTableCell>
+                    </>
+                  ):null}
                 </TableRow>
               </TableHead>
               <TableBody>
@@ -63,13 +83,23 @@ const MemberList:FC<Props> = ({list,messa,searchlist,setMessa,setSearchlist,chan
                     <StyledTableCell align="center">{item.mail}</StyledTableCell>
                     <StyledTableCell align="center">{item.birth}</StyledTableCell>
                     {change?(
-                        <StyledTableCell align="center">
-                          <Link href={`/change/${item.id}`}>
-                            <Button variant="contained">
-                              編集
+                        <>
+                          <StyledTableCell align="center">
+                            <Link href={`/change/${item.id}`}>
+                              <Button variant="contained">
+                                編集
+                              </Button>
+                            </Link>
+                          </StyledTableCell>
+                          <StyledTableCell align="center">
+                            <Button 
+                              variant="contained"
+                              onClick={()=>handledeleteclick(item.id)}
+                            >
+                              削除
                             </Button>
-                          </Link>
-                        </StyledTableCell>
+                          </StyledTableCell>
+                        </>
                       ):null}
                   </StyledTableRow>
                 ))}

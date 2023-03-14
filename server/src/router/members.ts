@@ -157,3 +157,30 @@ router.get("/:id",(req:Request,res:Response)=>{
     }
   })
 })
+
+router.delete("/deletemember/:id",(req:Request,res:Response)=>{
+  const {id}=req.params;
+  pool.query("SELECT s FROM users s WHERE s.id=$1",[id],(err,result)=>{
+    if(err){
+      return res.json({
+        message:"SQLのエラーです",
+      })
+    }else if(!result.rows.length){
+      return res.json({
+        message:"そのユーザーは存在しない",
+      })
+    }else{
+      pool.query("DELETE FROM users WHERE id=$1",[id],(err,result)=>{
+        if(err){
+          return res.json({
+            message:"SQL文(DELETE)のエラーです"
+          })
+        }else{
+          return res.json({
+            message:"ユーザを削除しました"
+          })
+        }
+      })
+    }
+  });
+})
