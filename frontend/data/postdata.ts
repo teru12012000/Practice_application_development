@@ -16,7 +16,7 @@ export type postmenu={
 
 export type Props={
   message:string;
-  list:memberlist[]|undefined;
+  list:memberlist[]|[];
 }
 export type Props2={
   message:string

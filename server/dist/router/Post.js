@@ -59,8 +59,8 @@ exports.post_router.post("/privatepost", (req, res) => {
         }
         else {
             const dataname = result.rows[0].name;
-            const databirth = result.rows[0].birth;
-            const table = dataname + databirth;
+            const user_id = result.rows[0].user_id;
+            const table = `user_table_${String(user_id)}`;
             console.log(result.rows);
             db_1.pool.query(`INSERT INTO ${table}(name, title, detail) values ($1, $2, $3)`, [name, title, detail], (err, result) => {
                 if (err) {

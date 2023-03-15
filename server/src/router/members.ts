@@ -62,6 +62,7 @@ router.post("/add",
       message:`入力形式が違うんじゃない？よく確認してね。`
     })
   }
+  //ユーザが存在しているかどうか
   pool.query("SELECT s FROM users s WHERE s.mail=$1",[mail],(error,result)=>{
     if(error){
       return res.json({
@@ -72,31 +73,49 @@ router.post("/add",
         message:"そのユーザは既に存在しています。"
       })
     }
-    pool.query("INSERT INTO users(name, mail, birth) values ($1, $2, $3)",[
-      name,
-      mail,
-      birth,
-    ],(error,result)=>{
-      const tablename:string=name+birth;
-      if(error){
-        return res.json({
-          message:"SQL(INSERT)に問題があります"
-        })
-      }else{
-        pool.query(`CREATE TABLE ${tablename}(name VARCHAR(255) NOT NULL, title VARCHAR(255) NOT NULL, detail VARCHAR(2000) NOT NULL)`,(error,result)=>{
-          if(error){
-            return res.json({
-              message:"SQLテーブル作成時エラー",
-            })
-          }else{
-            return res.json({
-              message:"OK",
-            })
-          }
-        })
-      }
-    })
-  })
+  });
+  //挿入
+  pool.query("INSERT INTO users(name, mail, birth) values ($1, $2, $3)",[
+    name,
+    mail,
+    birth,
+  ],(error,result)=>{
+    if(error){
+      return res.json({
+        message:"SQL(INSERT)に問題があります"
+      })
+    }else{
+      //挿入したユーザのidを取得
+      pool.query("SELECT * FROM users WHERE mail=$1",[mail],(error,result)=>{
+        if(error){
+          return res.json({
+            message:"id確認sqlエラー",
+          })
+        }else if(!result.rows.length){
+          return res.json({
+            message:"ユーザが存在しない",
+          })
+        }else{
+          const tablename:string=`user_table_${String(result.rows[0].id)}`;
+          //テーブル作成
+          pool.query(
+            `CREATE TABLE ${tablename}(name VARCHAR(255) NOT NULL, title VARCHAR(255) NOT NULL, detail VARCHAR(2000) NOT NULL, id SERIAL PRIMARY KEY)`,
+            (error,result)=>{
+            if(error){
+              return res.json({
+                message:"SQLテーブル作成時エラー",
+              })
+            }else{
+              return res.json({
+                message:"OK",
+              })
+            };
+          });
+        };
+      });
+    }
+  });
+
 });
 // change information
 router.put("/changeinfo/:id",
@@ -175,9 +194,17 @@ router.delete("/deletemember/:id",(req:Request,res:Response)=>{
           return res.json({
             message:"SQL文(DELETE)のエラーです"
           })
+        }
+      })
+      const tablename:string=`user_table_${String(id)}`
+      pool.query(`DROP TABLE ${tablename}`,(err,result)=>{
+        if(err){
+          return res.json({
+            message:"SQL文(DELETE)のエラーです"
+          })
         }else{
           return res.json({
-            message:"ユーザを削除しました"
+            message:"ユーザーを削除しました"
           })
         }
       })

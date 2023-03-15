@@ -9,15 +9,14 @@ import Link from "next/link";
 import { NextRouter } from "next/router";
 
 type Props={
-  list:memberlist[]|undefined;
+  list:memberlist[]|[];
   messa:string;
-  searchlist:memberlist[]|undefined;
+  searchlist:memberlist[]|[];
   setMessa:Dispatch<SetStateAction<string>>;
-  setSearchlist:Dispatch<SetStateAction<memberlist[]|undefined>>;
+  setSearchlist:Dispatch<SetStateAction<memberlist[]|[]>>;
   change:boolean;
-  router:NextRouter;
 }
-const MemberList:FC<Props> = ({list,messa,searchlist,setMessa,setSearchlist,change,router}) => {
+const MemberList:FC<Props> = ({list,messa,searchlist,setMessa,setSearchlist,change}) => {
   const handleChange=async(e: ChangeEvent<HTMLInputElement | HTMLTextAreaElement>)=>{
     if(e.currentTarget.value){
       const res=await fetch(`http://localhost:5050/member/search/${e.currentTarget.value}`);
@@ -25,7 +24,7 @@ const MemberList:FC<Props> = ({list,messa,searchlist,setMessa,setSearchlist,chan
       if(data.list){
         setSearchlist(data.list as memberlist[])
       }else{
-        setSearchlist(undefined);
+        setSearchlist([]);
         setMessa(data.message);
       }
     }else{
@@ -38,8 +37,8 @@ const MemberList:FC<Props> = ({list,messa,searchlist,setMessa,setSearchlist,chan
       method:"DELETE",
     });
     const data=await res.json();
-    if(data.message==="ユーザを削除しました"){
-      alert("ユーザを削除しました");
+    if(data.message==="ユーザーを削除しました"){
+      alert("ユーザーを削除しました");
       window.location.reload();
     }else{
       alert(data.message);
@@ -60,7 +59,7 @@ const MemberList:FC<Props> = ({list,messa,searchlist,setMessa,setSearchlist,chan
       </div>
       <div className={memberliststyle.contant}>
         <h1 className='animate__animated animate__backInLeft'>メンバー設定</h1>
-        {searchlist?(
+        {searchlist[0]?(
           <TableContainer component={Paper} className="animate__animated animate__fadeIn" style={{maxHeight:400}}>
             <Table area-label="memberlist">
               <TableHead>

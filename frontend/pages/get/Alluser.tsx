@@ -12,10 +12,11 @@ import { ChangeEvent, useState } from "react";
 export const getServerSideProps:GetServerSideProps<Props>=async()=>{
   const res=await fetch("http://localhost:5050/member/allusers");
   const data=await res.json();
+  console.log(data.list)
   return{
     props:{
       message:data.message,
-      list:data.list,
+      list:data.list??[],
     }
   } 
 } 
@@ -25,8 +26,8 @@ export const getServerSideProps:GetServerSideProps<Props>=async()=>{
 
 const Alluser:NextPage<Props> = ({message,list}) => {
   const [messa,setMessa]=useState<string>(message);
-  const [searchlist,setSearchlist]=useState<memberlist[]|undefined>(list);
-  
+  const [searchlist,setSearchlist]=useState<memberlist[]|[]>(list);
+  console.log(searchlist);
   return (
     <>
       <Head>

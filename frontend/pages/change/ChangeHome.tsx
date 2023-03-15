@@ -13,13 +13,13 @@ export const getServerSideProps:GetServerSideProps<Props>=async()=>{
   return{
     props:{
       message:data.message,
-      list:data.list,
+      list:data.list??[],
     }
   } 
 } 
 const ChangeHome:NextPage<Props> = ({message,list})=> {
   const [messa,setMessa]=useState<string>(message);
-  const [searchlist,setSearchlist]=useState<memberlist[]|undefined>(list);
+  const [searchlist,setSearchlist]=useState<memberlist[]|[]>(list);
   const router=useRouter();
   return (
     <>
@@ -36,7 +36,6 @@ const ChangeHome:NextPage<Props> = ({message,list})=> {
         setMessa={setMessa}
         setSearchlist={setSearchlist}
         change={true}
-        router={router}
       />
       <div style={{textAlign:"center"}}>
         <Link href="/post/Addmember">
