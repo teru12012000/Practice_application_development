@@ -14,7 +14,7 @@ const Addmember:NextPage = () => {
   const [name,setName]=useState<string|undefined>("");
   const [mail,setMail]=useState<string|undefined>("");
   const [birth,setBirth]=useState<string|undefined>("");
-  const [canpush,setCanpush]=useState<boolean>(true);
+  const [password,setPassword]=useState<string|undefined>("");
   const postlist:postmenu[]=[
     {
       title:"名前",
@@ -31,7 +31,13 @@ const Addmember:NextPage = () => {
       example:"20001201,必ず8文字で",
       info:birth,
       setInfo:setBirth,
+    },{
+      title:"パスワード",
+      example:"@abcd123,5文字以上で！",
+      info:password,
+      setInfo:setPassword,
     }
+
   ];
   const handleClick=async()=>{
     const res=await fetch("http://localhost:5050/member/add",{
@@ -43,6 +49,7 @@ const Addmember:NextPage = () => {
         "name":name,
         "mail":mail,
         "birth":birth,
+        "password":password,
       })
     });
     
@@ -51,6 +58,7 @@ const Addmember:NextPage = () => {
       setName("");
       setMail("");
       setBirth("");
+      setPassword("");
       router.push("/Success/Success")
     }else{
       alert(`エラーメッセージ：${data.message}`);

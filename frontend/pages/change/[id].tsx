@@ -56,7 +56,7 @@ const Change:NextPage<Props3> = ({message,list})=> {
     }
   ];
   const handleClick=async()=>{
-    const res=await fetch(`http://localhost:5050/member//changeinfo/${list?.id}`,{
+    const res=await fetch(`http://localhost:5050/member/changeinfo/${list?.id}`,{
       method:"PUT",
       headers:{
         'Content-Type':'application/json'

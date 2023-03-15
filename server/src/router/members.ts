@@ -2,7 +2,7 @@ import { Router,Request,Response } from "express";
 import { body } from "express-validator/src/middlewares/validation-chain-builders";
 import { Result, validationResult } from "express-validator/src/validation-result";
 import { pool } from "../db/db";
-
+import bcrypt from "bcrypt";
 export const router=Router();
 //search
 router.get("/search/:word",(req:Request,res:Response)=>{
@@ -52,10 +52,12 @@ router.post("/add",
   body("name").notEmpty(),
   body("mail").isEmail(),
   body("birth").isLength({min:8,max:8}),
-  (req:Request,res:Response)=>{
+  body("password").isLength({min:5}),
+async(req:Request,res:Response)=>{
   const name:string=req.body.name;
   const mail:string=req.body.mail;
   const birth:string=req.body.birth;
+  const password:string=req.body.password;
   const error=validationResult(req);
   if(!error.isEmpty()){
     return res.json({
@@ -74,11 +76,13 @@ router.post("/add",
       })
     }
   });
+  let hashedpassword:string=await bcrypt.hash(password,10);
   //挿入
-  pool.query("INSERT INTO users(name, mail, birth) values ($1, $2, $3)",[
+  pool.query("INSERT INTO users(name, mail, birth, password) values ($1, $2, $3, $4)",[
     name,
     mail,
     birth,
+    hashedpassword,
   ],(error,result)=>{
     if(error){
       return res.json({

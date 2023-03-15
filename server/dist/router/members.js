@@ -1,10 +1,23 @@
 "use strict";
+var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
+    function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
+    return new (P || (P = Promise))(function (resolve, reject) {
+        function fulfilled(value) { try { step(generator.next(value)); } catch (e) { reject(e); } }
+        function rejected(value) { try { step(generator["throw"](value)); } catch (e) { reject(e); } }
+        function step(result) { result.done ? resolve(result.value) : adopt(result.value).then(fulfilled, rejected); }
+        step((generator = generator.apply(thisArg, _arguments || [])).next());
+    });
+};
+var __importDefault = (this && this.__importDefault) || function (mod) {
+    return (mod && mod.__esModule) ? mod : { "default": mod };
+};
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.router = void 0;
 const express_1 = require("express");
 const validation_chain_builders_1 = require("express-validator/src/middlewares/validation-chain-builders");
 const validation_result_1 = require("express-validator/src/validation-result");
 const db_1 = require("../db/db");
+const bcrypt_1 = __importDefault(require("bcrypt"));
 exports.router = (0, express_1.Router)();
 //search
 exports.router.get("/search/:word", (req, res) => {
@@ -53,10 +66,11 @@ exports.router.get("/allusers", (req, res) => {
     });
 });
 //post user
-exports.router.post("/add", (0, validation_chain_builders_1.body)("name").notEmpty(), (0, validation_chain_builders_1.body)("mail").isEmail(), (0, validation_chain_builders_1.body)("birth").isLength({ min: 8, max: 8 }), (req, res) => {
+exports.router.post("/add", (0, validation_chain_builders_1.body)("name").notEmpty(), (0, validation_chain_builders_1.body)("mail").isEmail(), (0, validation_chain_builders_1.body)("birth").isLength({ min: 8, max: 8 }), (0, validation_chain_builders_1.body)("password").isLength({ min: 5 }), (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     const name = req.body.name;
     const mail = req.body.mail;
     const birth = req.body.birth;
+    const password = req.body.password;
     const error = (0, validation_result_1.validationResult)(req);
     if (!error.isEmpty()) {
         return res.json({
@@ -76,11 +90,13 @@ exports.router.post("/add", (0, validation_chain_builders_1.body)("name").notEmp
             });
         }
     });
+    let hashedpassword = yield bcrypt_1.default.hash(password, 10);
     //挿入
-    db_1.pool.query("INSERT INTO users(name, mail, birth) values ($1, $2, $3)", [
+    db_1.pool.query("INSERT INTO users(name, mail, birth, password) values ($1, $2, $3, $4)", [
         name,
         mail,
         birth,
+        hashedpassword,
     ], (error, result) => {
         if (error) {
             return res.json({
@@ -121,7 +137,7 @@ exports.router.post("/add", (0, validation_chain_builders_1.body)("name").notEmp
             });
         }
     });
-});
+}));
 // change information
 exports.router.put("/changeinfo/:id", (0, validation_chain_builders_1.body)("name").notEmpty(), (0, validation_chain_builders_1.body)("mail").isEmail(), (0, validation_chain_builders_1.body)("birth").isLength({ min: 8, max: 8 }), (req, res) => {
     const numid = parseInt(req.params.id, 10);
